@@ -1,0 +1,9 @@
+.venv
+*.pyc
+*/__pycache__
+__pycache__
+assets/*.png
+assets/*.gif
+assets
+
+

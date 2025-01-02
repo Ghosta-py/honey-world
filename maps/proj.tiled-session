@@ -1,0 +1,73 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "map2.tmx",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "file.lastUsedOpenFilter": "All Files (*)",
+    "fileStates": {
+        "#tileset": {
+            "scaleInDock": 3
+        },
+        "Tileset.tsx": {
+            "scaleInDock": 0.75,
+            "scaleInEditor": 0.33
+        },
+        "map.json": {
+            "scale": 0.75,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 377.33333333333337,
+                "y": 106
+            }
+        },
+        "map.tmx": {
+            "scale": 1,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 245,
+                "y": 161.5
+            }
+        },
+        "map2.tmx": {
+            "scale": 0.25,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 700,
+                "y": 726
+            }
+        }
+    },
+    "last.exportedFilePath": "/home/mostafa/Desktop/dev/honey_world/maps",
+    "last.imagePath": "/home/mostafa/Desktop/dev/honey_world/assets/Tileset",
+    "map.fixedSize": true,
+    "map.height": 128,
+    "map.lastUsedExportFilter": "Tiled map files (*.tmx *.xml)",
+    "map.lastUsedFormat": "tmx",
+    "map.tileHeight": 16,
+    "map.tileWidth": 16,
+    "map.width": 128,
+    "openFiles": [
+        "Tileset.tsx",
+        "map.json",
+        "map.tmx",
+        "map2.tmx"
+    ],
+    "project": "proj.tiled-project",
+    "property.type": "bool",
+    "recentFiles": [
+        "Tileset.tsx",
+        "map.json",
+        "map.tmx",
+        "map2.tmx"
+    ],
+    "tileset.embedInMap": false,
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 16,
+        "width": 16
+    }
+}
