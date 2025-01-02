@@ -5,5 +5,5 @@ __pycache__
 assets/*.png
 assets/*.gif
 assets
-
+log
 
