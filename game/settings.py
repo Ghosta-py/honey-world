@@ -20,6 +20,9 @@ CONFIG = {
     "right": {pg.K_RIGHT, pg.K_d},
     "up": {pg.K_UP, pg.K_w},
     "down": {pg.K_DOWN, pg.K_s},
+    "attack": {pg.K_x},
+    "roll": {pg.K_c},
+    "run": {pg.K_LCTRL},
 }
 
 FULL_WINDOW = False
