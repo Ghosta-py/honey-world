@@ -145,7 +145,6 @@ class Player(Entity):
             self.vel = pg.Vector2(0, 0)
 
         super().update(dt)
-        self.debug_state()
 
     def debug_state(self):
         print(f"State: {self.state}, Velocity: {self.vel}, Animation Done: {self.animation.done}, Is roll: {self.keys["roll"]}", end="\r")
