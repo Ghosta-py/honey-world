@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "map2.tmx",
+    "activeFile": "Tileset.tsx",
     "expandedProjectPaths": [
         "."
     ],
@@ -13,8 +13,12 @@
             "scaleInDock": 3
         },
         "Tileset.tsx": {
-            "scaleInDock": 0.75,
-            "scaleInEditor": 0.33
+            "scaleInDock": 0.0625,
+            "scaleInEditor": 3
+        },
+        "grass.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 8
         },
         "map.json": {
             "scale": 0.75,
@@ -33,11 +37,11 @@
             }
         },
         "map2.tmx": {
-            "scale": 0.25,
-            "selectedLayer": 2,
+            "scale": 0.5,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 700,
-                "y": 726
+                "x": 758,
+                "y": 1733
             }
         }
     },
@@ -59,10 +63,11 @@
     "project": "proj.tiled-project",
     "property.type": "bool",
     "recentFiles": [
-        "Tileset.tsx",
-        "map.json",
+        "map2.tmx",
         "map.tmx",
-        "map2.tmx"
+        "map.json",
+        "Tileset.tsx",
+        "grass.tsx"
     ],
     "tileset.embedInMap": false,
     "tileset.lastUsedFormat": "tsx",

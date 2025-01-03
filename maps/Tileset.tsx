@@ -213,10 +213,21 @@
  <tile id="459" probability="0.2"/>
  <tile id="521" probability="0.2"/>
  <tile id="522" probability="0.2"/>
+ <tile id="1364">
+  <objectgroup draworder="index" id="4">
+   <object id="15" x="8.90909" y="0.454545" width="7.36364" height="15.2727"/>
+  </objectgroup>
+ </tile>
+ <tile id="2182" probability="0.1"/>
+ <tile id="2245" probability="0.1"/>
+ <tile id="2246" probability="0.1"/>
+ <tile id="2247" probability="0.1"/>
+ <tile id="2310" probability="0.1"/>
  <tile id="2326" probability="0.4"/>
  <wangsets>
-  <wangset name="Path" type="mixed" tile="-1">
+  <wangset name="path" type="mixed" tile="-1">
    <wangcolor name="Path" color="#ff0000" tile="-1" probability="1"/>
+   <wangtile tileid="67" wangid="1,1,1,1,1,1,1,1"/>
    <wangtile tileid="449" wangid="1,1,1,1,1,1,1,1"/>
    <wangtile tileid="450" wangid="0,1,1,1,1,1,0,0"/>
    <wangtile tileid="451" wangid="0,0,0,1,1,1,1,1"/>
