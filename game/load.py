@@ -95,7 +95,7 @@ def load_characters(root_dir):
 
 
 def load_tiles():
-    tilemap = load_pygame(os.path.join(BASE, "maps", "map2.tmx"))
+    tilemap = load_pygame(os.path.join(BASE, "maps", "test.tmx"))
     set_map_size((tilemap.width * tilemap.tilewidth, tilemap.height * tilemap.tileheight))
     return tilemap
 

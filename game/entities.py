@@ -72,15 +72,17 @@ class Entity(pg.sprite.Sprite):
         self.state = "idle"
         self.movables = {"roll", "idle", "walk", "run", "jump"}
         self.is_right = True
+        self.z_index = self.rect.bottom
 
     def update(self, dt: float) -> None:
         if self.vel.x:
             self.is_right = self.vel.x > 0
         self.map_width, self.map_height = get_map_size()
         self.pos += self.vel * dt
-        self.pos.x = max(0, min(self.pos.x, self.map_width - self.rect.width))
-        self.pos.y = max(0, min(self.pos.y, self.map_height - self.rect.height))
+        self.pos.x = max(-self.rect.width, min(self.pos.x, self.map_width - self.rect.width))
+        self.pos.y = max(-self.rect.height, min(self.pos.y, self.map_height - self.rect.height))
         self.rect.topleft = self.pos
+        self.z_index = self.rect.bottom
 
         if self.animation.can_switch_state(self.state):
             self.animation.switch_to(self.state)
@@ -95,6 +97,17 @@ class Entity(pg.sprite.Sprite):
         if not self.is_right:
             image = pg.transform.flip(image, True, False)
         screen.blit(image, rect)
+
+    def get_drawable(self, screen, offset=lambda x: x):
+        """Return the entity as a drawable with its z-index."""
+        rect = offset(self.rect)
+        if rect.colliderect(screen.get_rect()):
+            image = self.image
+            if not self.is_right:
+                image = pg.transform.flip(image, True, False)
+            return (self.z_index, image, rect.topleft)
+        return None
+
 
 class Player(Entity):
     def __init__(self, pos: tuple):

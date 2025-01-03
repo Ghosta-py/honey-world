@@ -45,9 +45,10 @@ class Game:
 
     def draw(self):
         self.screen.fill((70, 70, 70))
-        self.map.draw(self.screen, self.camera.apply)
+        self.map.draw_layer(self.screen, "Base",self.camera.apply)
         self.test.draw(self.screen, self.camera.apply)
         self.player.draw(self.screen, self.camera.apply)
+        self.map.draw_layer(self.screen, "Decor",self.camera.apply)
 
         new_height = int(self.display.width / (self.aspect))
         scaled_screen = pg.transform.scale(self.screen, (self.display.width, new_height))
