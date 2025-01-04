@@ -75,12 +75,11 @@ class Entity(pg.sprite.Sprite):
         self.is_right = True
         self.z_index = self.rect.bottom
 
-        # Pymunk integration
-        self.body = pymunk.Body(0.1, 1, body_type=pymunk.Body.DYNAMIC)
-        self.body.position = pos
+        self.body = pymunk.Body(0.01, 12, body_type=pymunk.Body.DYNAMIC)
+        self.body.position = self.hitbox.center
         self.shape = pymunk.Poly.create_box(self.body, size=self.hitbox.size)
-        self.shape.elasticity = 0.5
-        self.shape.friction = 0.5
+        self.shape.elasticity = 0
+        self.shape.friction = 0
 
         if space:
             space.add(self.body, self.shape)
@@ -89,16 +88,15 @@ class Entity(pg.sprite.Sprite):
         mask_rect = self.mask.get_bounding_rects()[0]
         self.hitbox = pg.Rect(
             self.pos.x + mask_rect.x,
-            self.pos.y + mask_rect.y,
+            self.pos.y + mask_rect.y + mask_rect.height // 2,
             mask_rect.width,
-            mask_rect.height
+            mask_rect.height // 2
         )
 
     def update(self, dt: float) -> None:
         if self.vel.x:
             self.is_right = self.vel.x > 0
 
-        # Update position and velocity via Pymunk
         self.body.velocity = self.vel.x, self.vel.y
         self.pos = pg.Vector2(self.body.position)
 

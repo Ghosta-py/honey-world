@@ -27,7 +27,6 @@ class Game:
         self.space.gravity = (0, 0)
         self.camera = Camera(self.screen.width, self.screen.height)
 
-        self.add_static_platform((150, 400), (400, 20))
         self.player = Player((0, 0), space=self.space)
         self.test = Entity((300, 200), space=self.space)
 
@@ -38,17 +37,6 @@ class Game:
         handler.begin = self.on_collision_begin
 
         self.speed_modifier = 0
-
-    def add_static_platform(self, position, size):
-        """Add a static platform to the space."""
-        body = pymunk.Body(body_type=pymunk.Body.STATIC)
-        body.position = position
-        shape = pymunk.Poly.create_box(body, size)
-        shape.elasticity = 0.5
-        shape.friction = 0.8
-        shape.collision_type = 3  # Unique collision type for the platform
-        self.space.add(body, shape)
-
 
     def on_collision_begin(self, arbiter, space, data):
         print("Collision detected!")
