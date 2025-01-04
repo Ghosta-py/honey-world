@@ -23,13 +23,41 @@ class Game:
         set_assets(load_characters("assets"))
         self.map = Map()
 
+        self.space = pymunk.Space()
+        self.space.gravity = (0, 0)
         self.camera = Camera(self.screen.width, self.screen.height)
-        self.player = Player((0, 0))
-        self.test = Entity((0, 0))
+
+        self.add_static_platform((150, 400), (400, 20))
+        self.player = Player((0, 0), space=self.space)
+        self.test = Entity((300, 200), space=self.space)
+
+        self.player.shape.collision_type = 1
+        self.test.shape.collision_type = 2
+
+        handler = self.space.add_collision_handler(1, 2)
+        handler.begin = self.on_collision_begin
+
+        self.speed_modifier = 0
+
+    def add_static_platform(self, position, size):
+        """Add a static platform to the space."""
+        body = pymunk.Body(body_type=pymunk.Body.STATIC)
+        body.position = position
+        shape = pymunk.Poly.create_box(body, size)
+        shape.elasticity = 0.5
+        shape.friction = 0.8
+        shape.collision_type = 3  # Unique collision type for the platform
+        self.space.add(body, shape)
+
+
+    def on_collision_begin(self, arbiter, space, data):
+        print("Collision detected!")
+        return True
 
     def update(self, dt):
         self.player.update(dt)
         self.test.update(dt)
+        self.space.step(dt)
         self.camera.follow(self.player)
 
     def handle_events(self):
@@ -41,6 +69,10 @@ class Game:
             if keys[pg.K_SPACE]:
                 FULL_WINDOW = not FULL_WINDOW
                 self.__init__()
+            if keys[pg.K_UP]:
+                self.speed_modifier += 0.1
+            if keys[pg.K_DOWN]:
+                self.speed_modifier -= 0.1
             self.player.handle_event(event)
 
     def add_drawable(self, drawable, target):
@@ -51,10 +83,10 @@ class Game:
         self.screen.fill((70, 70, 70))
         drawables = []
         self.map.draw_layer(self.screen, "Base",self.camera.apply)
+        self.map.draw_layer(self.screen, "Decor",self.camera.apply)
 
         self.add_drawable(drawables, self.test.get_drawable(self.screen, self.camera.apply))
         self.add_drawable(drawables, self.player.get_drawable(self.screen, self.camera.apply))
-        self.add_drawable(drawables, self.map.get_layer(self.screen, "Decor",self.camera.apply))
         self.add_drawable(drawables, self.map.get_layer(self.screen, "Trees",self.camera.apply))
         drawables = sorted(drawables, key=lambda x: x[2])
 
@@ -70,6 +102,7 @@ class Game:
     def run(self):
         while self.running:
             dt = self.clock.tick(60) / 1000
+            dt += dt * self.speed_modifier
             self.update(dt)
             self.handle_events()
             self.draw()

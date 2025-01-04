@@ -1,5 +1,2 @@
-# for the game
 pygame-ce
-
-# for loading the tilemap
 pytmx

@@ -1,5 +1,6 @@
 import os
 import pygame as pg
+import pymunk
 
 
 BASE = os.path.abspath(".")

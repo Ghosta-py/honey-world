@@ -1,112 +1,83 @@
 import pygame as pg
-import os
+import pymunk
+import pymunk.pygame_util
 
+# Initialize Pygame
+pg.init()
 
-def load_image(file, alpha=True, colorkey=None):
-    try:
-        image = pg.image.load(file)
-        if alpha:
-            image = image.convert_alpha()
-        else:
-            image = image.convert()
+# Constants
+SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
+PLAYER_WIDTH, PLAYER_HEIGHT = 40, 40
 
-        if colorkey is not None:
-            image.set_colorkey(colorkey, pg.RLEACCEL)
-        return image
-    except pg.error as message:
-        print(f"Cannot load image: {file}")
-        raise SystemExit(message)
+# Set up the game screen
+screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+clock = pg.time.Clock()
 
-def load_strip(file, frame_size, alpha=True, colorkey=None):
-    main_image = load_image(file, alpha, colorkey)
-    strips = []
-    for x in range(0, main_image.get_width(), frame_size[0]):
-        frame = pg.Surface(frame_size, pg.SRCALPHA)
-        frame.blit(main_image, (0, 0), (x, 0, frame_size[0], frame_size[1]))
-        strips.append(frame)
-    return strips
+# Pymunk space setup
+space = pymunk.Space()
+space.gravity = (0, 500)  # Set gravity to something realistic
 
+def add_static_box(space, x, y, width, height):
+    body = pymunk.Body(body_type=pymunk.Body.STATIC)
+    body.position = x, y
+    shape = pymunk.Poly.create_box(body, (width, height))
+    space.add(body, shape)
+    return shape
 
-def load_assets(root_dir):
-    assets = {}
+def add_kinematic_player(space, x, y, width, height):
+    body = pymunk.Body(body_type=pymunk.Body.KINEMATIC)
+    body.position = x, y
+    shape = pymunk.Poly.create_box(body, (width, height))
+    shape.elasticity = 0.9  # Bouncy collisions
+    shape.collision_type = 1
+    space.add(body, shape)
+    return body, shape
 
-    for root, _, files in os.walk(root_dir):
-        if "Characters" not in root:
-            continue
+# Collision handler for the player
+def on_collision_begin(arbiter, space, data):
+    print("Collision detected!")
+    return True  # Allow the collision to happen
 
-        category = os.path.relpath(root, root_dir).split(os.sep)
-        if len(category) < 2:
-            continue
+handler = space.add_collision_handler(1, 1)
+handler.begin = on_collision_begin
 
-        name = category[1].lower()
-        if name not in assets:
-            assets[name] = {}
+# Add static box and kinematic player
+static_box = add_static_box(space, 400, 500, 200, 20)
+player_body, player_shape = add_kinematic_player(space, 100, 100, PLAYER_WIDTH, PLAYER_HEIGHT)
 
-        for file in files:
-            if not file.endswith(".png"):
-                continue
+# Main game loop
+running = True
+while running:
+    dt = clock.tick(60) / 1000  # Time step in seconds
+    screen.fill((30, 30, 30))   # Clear the screen
 
-            file_path = os.path.join(root, file)
-            base_name, _ = os.path.splitext(file)
+    # Handle events
+    for event in pg.event.get():
+        if event.type == pg.QUIT:
+            running = False
 
-            parts = base_name.split("_")
-            if len(parts) < 2:
-                print(f"File {file} does not follow naming convention.")
-                continue
+    # Handle player movement (manual for kinematic object)
+    keys = pg.key.get_pressed()
+    velocity = [0, 0]
+    if keys[pg.K_LEFT]:
+        velocity[0] = -200
+    if keys[pg.K_RIGHT]:
+        velocity[0] = 200
+    if keys[pg.K_UP]:
+        velocity[1] = -200
+    if keys[pg.K_DOWN]:
+        velocity[1] = 200
 
-            action = parts[1].lower()
-            variant = "base"
+    # Update player position manually
+    player_body.position += pymunk.Vec2d(*velocity) * dt
 
-            if name == "human":
-                if len(parts) > 2 and "_strip" in parts[-1]:
-                    variant = "_".join(parts[2:-1]).lower()
-                elif len(parts) > 2:
-                    variant = parts[0].lower()
+    # Step the physics simulation
+    space.step(dt)
 
-            if name not in assets:
-                assets[name] = {}
-            if action not in assets[name]:
-                assets[name][action] = {}
+    # Pymunk debugging
+    options = pymunk.pygame_util.DrawOptions(screen)
+    space.debug_draw(options)
 
-            if variant not in assets[name][action]:
-                assets[name][action][variant] = []
+    pg.display.flip()
 
-            if "_strip" in file:
-                strip_info = base_name.split("_strip")[-1]
-                try:
-                    frame_count = int(strip_info)
-                    frame_width = load_image(file_path).get_width() // frame_count
-                    frame_height = load_image(file_path).get_height()
-                    frames = load_strip(file_path, (frame_width, frame_height))
-                except ValueError:
-                    print(f"Invalid strip format in file: {file}")
-                    continue
-            else:
-                frames = [load_image(file_path)]
-
-            assets[name][action][variant].extend(frames)
-
-    return assets
-
-
-
-
-
-if __name__ == "__main__":
-    pg.init(); 
-    screen = pg.display.set_mode((100,100))
-    characters = load_assets("assets")
-    for key in characters:
-        print(key)
-        if characters[key]:
-            print("\t", characters[key].keys())
-            for action in characters[key]:
-                print("\t\t", action)
-                for variant in characters[key][action]:
-                    print("\t\t\t", variant)
-                    for frame in characters[key][action][variant]:
-                        screen.fill((70, 70, 70))
-                        screen.blit(frame, (0, 0))
-                        pg.display.flip()
-                        pg.time.wait(150)
-
+pg.quit()

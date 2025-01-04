@@ -58,7 +58,7 @@ class Animation:
             self.current = self.frames[self.frame]
 
 class Entity(pg.sprite.Sprite):
-    def __init__(self, pos: tuple, entity_type: str="goblin"):
+    def __init__(self, pos: tuple, entity_type: str = "goblin", space=None):
         super().__init__()
         self.pos = pg.Vector2(pos)
         self.vel = pg.Vector2(0, 0)
@@ -67,21 +67,44 @@ class Entity(pg.sprite.Sprite):
         self.animation = Animation(ASSETS[self.type])
         self.image = self.animation.current
         self.rect = self.image.get_rect(topleft=self.pos)
+        self.mask = pg.mask.from_surface(self.image)
+        self.set_hitbox()
 
         self.state = "idle"
         self.movables = {"roll", "idle", "walk", "run", "jump"}
         self.is_right = True
         self.z_index = self.rect.bottom
 
+        # Pymunk integration
+        self.body = pymunk.Body(0.1, 1, body_type=pymunk.Body.DYNAMIC)
+        self.body.position = pos
+        self.shape = pymunk.Poly.create_box(self.body, size=self.hitbox.size)
+        self.shape.elasticity = 0.5
+        self.shape.friction = 0.5
+
+        if space:
+            space.add(self.body, self.shape)
+
+    def set_hitbox(self):
+        mask_rect = self.mask.get_bounding_rects()[0]
+        self.hitbox = pg.Rect(
+            self.pos.x + mask_rect.x,
+            self.pos.y + mask_rect.y,
+            mask_rect.width,
+            mask_rect.height
+        )
+
     def update(self, dt: float) -> None:
         if self.vel.x:
             self.is_right = self.vel.x > 0
-        self.map_width, self.map_height = get_map_size()
-        self.pos += self.vel * dt
-        self.pos.x = max(0, min(self.pos.x, self.map_width - self.rect.width))
-        self.pos.y = max(0, min(self.pos.y, self.map_height - self.rect.height))
+
+        # Update position and velocity via Pymunk
+        self.body.velocity = self.vel.x, self.vel.y
+        self.pos = pg.Vector2(self.body.position)
+
+        self.set_hitbox()
         self.rect.topleft = self.pos
-        self.z_index = self.rect.bottom
+        self.z_index = self.hitbox.bottom
 
         if self.animation.can_switch_state(self.state):
             self.animation.switch_to(self.state)
@@ -101,6 +124,8 @@ class Entity(pg.sprite.Sprite):
         """Return the entity as a drawable with its z-index."""
         rect = offset(self.rect)
         image = self.image
+        self.hitbox = offset(self.hitbox)
+        pg.draw.rect(screen, (0, 255, 0), self.hitbox, 1)
         if not self.is_right:
             image = pg.transform.flip(image, True, False)
         result = image, rect, self.z_index
@@ -108,8 +133,8 @@ class Entity(pg.sprite.Sprite):
 
 
 class Player(Entity):
-    def __init__(self, pos: tuple):
-        super().__init__(pos, entity_type="human")
+    def __init__(self, pos: tuple, space=None):
+        super().__init__(pos, entity_type="human", space=space)
         self.keys = {
             "left": False,"right": False, "up": False, "down": False,
             "attack": False, "roll": False, "run": False
@@ -131,7 +156,12 @@ class Player(Entity):
         if self.state in self.immutables:
             self.vel = pg.Vector2(0, 0)
             if self.state == "roll" and not self.animation.done:
-                self.vel.x = 2 * self.speed * (1 if self.is_right else -1)
+                if self.vel.length() == 0:
+                    direction = pg.Vector2(
+                        self.keys["right"] - self.keys["left"],
+                        self.keys["down"] - self.keys["up"]
+                    )
+                self.vel = 5 * self.speed * direction
             elif self.animation.done:
                 self.keys[self.state] = False
                 self.state = "idle"
