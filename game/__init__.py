@@ -43,19 +43,20 @@ class Game:
                 self.__init__()
             self.player.handle_event(event)
 
+    def add_drawable(self, drawable, target):
+        if target:
+            drawable += target
+
     def draw(self):
         self.screen.fill((70, 70, 70))
         drawables = []
         self.map.draw_layer(self.screen, "Base",self.camera.apply)
-        drawables += self.test.get_drawable(self.screen, self.camera.apply)
-        drawables += self.player.get_drawable(self.screen, self.camera.apply)
-        drawables += self.map.get_layer(self.screen, "Decor",self.camera.apply)
-        drawables += self.map.get_layer(self.screen, "Trees",self.camera.apply)
+
+        self.add_drawable(drawables, self.test.get_drawable(self.screen, self.camera.apply))
+        self.add_drawable(drawables, self.player.get_drawable(self.screen, self.camera.apply))
+        self.add_drawable(drawables, self.map.get_layer(self.screen, "Decor",self.camera.apply))
+        self.add_drawable(drawables, self.map.get_layer(self.screen, "Trees",self.camera.apply))
         drawables = sorted(drawables, key=lambda x: x[2])
-        # self.map.draw_layer(self.screen, "Base",self.camera.apply)
-        # self.test.draw(self.screen, self.camera.apply)
-        # self.player.draw(self.screen, self.camera.apply)
-        # self.map.draw_layer(self.screen, "Decor",self.camera.apply)
 
         for image, pos, _ in drawables:
             pg.draw.rect(self.screen, (_ % 255, 0, 0), pos, 1)

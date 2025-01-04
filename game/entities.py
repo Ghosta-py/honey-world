@@ -1,12 +1,11 @@
 from .settings import *
 import pygame as pg
+from typing import Dict, List, Optional, Callable
+
 
 def is_pressed(event, action):
     return event.key in CONFIG.get(action, [])
 
-
-import pygame as pg
-from typing import Dict, List, Optional, Callable
 
 class Animation:
     def __init__(self, pack: Dict[str, Dict[str, List[pg.Surface]]], variant: str = "base", loop_duration: float = 1.2, one_time: bool = False):
@@ -79,8 +78,8 @@ class Entity(pg.sprite.Sprite):
             self.is_right = self.vel.x > 0
         self.map_width, self.map_height = get_map_size()
         self.pos += self.vel * dt
-        self.pos.x = max(-self.rect.width, min(self.pos.x, self.map_width - self.rect.width))
-        self.pos.y = max(-self.rect.height, min(self.pos.y, self.map_height - self.rect.height))
+        self.pos.x = max(0, min(self.pos.x, self.map_width - self.rect.width))
+        self.pos.y = max(0, min(self.pos.y, self.map_height - self.rect.height))
         self.rect.topleft = self.pos
         self.z_index = self.rect.bottom
 
