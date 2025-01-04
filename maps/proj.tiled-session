@@ -12,9 +12,15 @@
         "#tileset": {
             "scaleInDock": 3
         },
+        "Forest Objects.tsx": {
+            "dynamicWrapping": false
+        },
         "Tileset.tsx": {
             "scaleInDock": 0.0625,
             "scaleInEditor": 3
+        },
+        "Trees.tsx": {
+            "dynamicWrapping": true
         },
         "grass.tsx": {
             "scaleInDock": 1,
@@ -46,7 +52,7 @@
         }
     },
     "last.exportedFilePath": "/home/mostafa/Desktop/dev/honey_world/maps",
-    "last.imagePath": "/home/mostafa/Desktop/dev/honey_world/assets/Tileset/Pixel Lands Forest Demo",
+    "last.imagePath": "/home/mostafa/Desktop/dev/honey_world/assets/Tileset/Pixel Lands Forest Demo/objects",
     "map.fixedSize": true,
     "map.height": 20,
     "map.lastUsedExportFilter": "Tiled map files (*.tmx *.xml)",
@@ -70,5 +76,6 @@
     "tileset.tileSize": {
         "height": 16,
         "width": 16
-    }
+    },
+    "tileset.type": 1
 }

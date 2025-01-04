@@ -101,12 +101,11 @@ class Entity(pg.sprite.Sprite):
     def get_drawable(self, screen, offset=lambda x: x):
         """Return the entity as a drawable with its z-index."""
         rect = offset(self.rect)
-        if rect.colliderect(screen.get_rect()):
-            image = self.image
-            if not self.is_right:
-                image = pg.transform.flip(image, True, False)
-            return (self.z_index, image, rect.topleft)
-        return None
+        image = self.image
+        if not self.is_right:
+            image = pg.transform.flip(image, True, False)
+        result = image, rect, self.z_index
+        return [result]
 
 
 class Player(Entity):

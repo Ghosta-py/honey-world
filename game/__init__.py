@@ -45,10 +45,21 @@ class Game:
 
     def draw(self):
         self.screen.fill((70, 70, 70))
+        drawables = []
         self.map.draw_layer(self.screen, "Base",self.camera.apply)
-        self.test.draw(self.screen, self.camera.apply)
-        self.player.draw(self.screen, self.camera.apply)
-        self.map.draw_layer(self.screen, "Decor",self.camera.apply)
+        drawables += self.test.get_drawable(self.screen, self.camera.apply)
+        drawables += self.player.get_drawable(self.screen, self.camera.apply)
+        drawables += self.map.get_layer(self.screen, "Decor",self.camera.apply)
+        drawables += self.map.get_layer(self.screen, "Trees",self.camera.apply)
+        drawables = sorted(drawables, key=lambda x: x[2])
+        # self.map.draw_layer(self.screen, "Base",self.camera.apply)
+        # self.test.draw(self.screen, self.camera.apply)
+        # self.player.draw(self.screen, self.camera.apply)
+        # self.map.draw_layer(self.screen, "Decor",self.camera.apply)
+
+        for image, pos, _ in drawables:
+            pg.draw.rect(self.screen, (_ % 255, 0, 0), pos, 1)
+            self.screen.blit(image, pos)
 
         new_height = int(self.display.width / (self.aspect))
         scaled_screen = pg.transform.scale(self.screen, (self.display.width, new_height))
