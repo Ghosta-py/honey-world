@@ -24,7 +24,8 @@ class Game:
         self.map = Map()
 
         self.camera = Camera(self.screen.width, self.screen.height)
-        self.player = Player((0, 0))
+        self.player = Player((-10, -10))
+        self.test = Entity((300, 200))
 
         self.speed_modifier = 0
 
@@ -34,6 +35,8 @@ class Game:
 
     def update(self, dt):
         collides = self.map.objects
+        collides.add(self.test)
+        self.test.update(dt, collides)
         self.player.update(dt, collides)
         self.camera.follow(self.player)
 
@@ -61,6 +64,7 @@ class Game:
         drawables = []
         self.map.draw_layer(self.screen, "Base",self.camera.apply)
         self.map.draw_layer(self.screen, "Decor",self.camera.apply)
+        self.add_drawable(drawables, self.test.get_drawable(self.screen, self.camera.apply))
         self.add_drawable(drawables, self.player.get_drawable(self.screen, self.camera.apply))
         self.add_drawable(drawables, self.map.get_layer(self.screen, "Trees",self.camera.apply))
         drawables = sorted(drawables, key=lambda x: x[2])
