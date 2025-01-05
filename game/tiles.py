@@ -4,16 +4,18 @@ import pytmx
 
 
 class Tile(pg.sprite.Sprite):
-    def __init__(self, pos, surface):
+    def __init__(self, pos, surface, collider=False):
         super().__init__()
         self.image = surface
         self.rect = self.image.get_rect(topleft=pos)
+        self.collider = collider
 
 class Object(pg.sprite.Sprite):
-    def __init__(self, pos, surface):
+    def __init__(self, pos, surface, collider=True):
         super().__init__()
         self.image = surface
         self.rect = self.image.get_rect(topleft=pos)
+        self.collider = collider
 
 
 class Map:
@@ -21,6 +23,8 @@ class Map:
         self.map = load_tiles()
         self.tile_cache = {}
         self.layers = {}
+        self.collidable_tiles = pg.sprite.Group()
+        self.collidable_objects = pg.sprite.Group()
 
         for layer in self.map.visible_layers:
             self._add_layer(layer.name, layer)
@@ -31,10 +35,14 @@ class Map:
             for x, y, surface in layer.tiles()
         ])
         self.objects = pg.sprite.Group([
-            Object((obj.x , obj.y), obj.image)
+            Object((obj.x, obj.y), obj.image)
             for obj in self.map.objects
             if obj.image
         ])
+
+        self.collidable_tiles.add(list(tile for tile in self.tiles if tile.collider))
+        self.collidable_objects.add(list(obj for obj in self.objects if obj.collider))
+
 
     def _add_layer(self, layer_name, layer):
         """Add a tile layer to the layers dictionary."""

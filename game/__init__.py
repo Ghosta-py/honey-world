@@ -23,18 +23,8 @@ class Game:
         set_assets(load_characters("assets"))
         self.map = Map()
 
-        self.space = pymunk.Space()
-        self.space.gravity = (0, 0)
         self.camera = Camera(self.screen.width, self.screen.height)
-
-        self.player = Player((0, 0), space=self.space)
-        self.test = Entity((300, 200), space=self.space)
-
-        self.player.shape.collision_type = 1
-        self.test.shape.collision_type = 2
-
-        handler = self.space.add_collision_handler(1, 2)
-        handler.begin = self.on_collision_begin
+        self.player = Player((0, 0))
 
         self.speed_modifier = 0
 
@@ -43,9 +33,8 @@ class Game:
         return True
 
     def update(self, dt):
-        self.player.update(dt)
-        self.test.update(dt)
-        self.space.step(dt)
+        collides = self.map.objects
+        self.player.update(dt, collides)
         self.camera.follow(self.player)
 
     def handle_events(self):
@@ -72,8 +61,6 @@ class Game:
         drawables = []
         self.map.draw_layer(self.screen, "Base",self.camera.apply)
         self.map.draw_layer(self.screen, "Decor",self.camera.apply)
-
-        self.add_drawable(drawables, self.test.get_drawable(self.screen, self.camera.apply))
         self.add_drawable(drawables, self.player.get_drawable(self.screen, self.camera.apply))
         self.add_drawable(drawables, self.map.get_layer(self.screen, "Trees",self.camera.apply))
         drawables = sorted(drawables, key=lambda x: x[2])

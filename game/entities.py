@@ -68,6 +68,7 @@ class Entity(pg.sprite.Sprite):
         self.image = self.animation.current
         self.rect = self.image.get_rect(topleft=self.pos)
         self.mask = pg.mask.from_surface(self.image)
+        self.mask_rect = self.mask.get_bounding_rects()[0]
         self.set_hitbox()
 
         self.state = "idle"
@@ -75,33 +76,35 @@ class Entity(pg.sprite.Sprite):
         self.is_right = True
         self.z_index = self.rect.bottom
 
-        self.body = pymunk.Body(0.01, 12, body_type=pymunk.Body.DYNAMIC)
-        self.body.position = self.hitbox.center
-        self.shape = pymunk.Poly.create_box(self.body, size=self.hitbox.size)
-        self.shape.elasticity = 0
-        self.shape.friction = 0
-
-        if space:
-            space.add(self.body, self.shape)
+        self.hitbox_bottom_offset = self.rect.bottom - self.hitbox.bottom
+        self.hitbox_top_offset = self.rect.top - self.hitbox.top
+        self.hitbox_right_offset = self.rect.right - self.hitbox.right
+        self.hitbox_left_offset = self.rect.left - self.hitbox.left
 
     def set_hitbox(self):
-        mask_rect = self.mask.get_bounding_rects()[0]
+        mask_rect = self.mask_rect
         self.hitbox = pg.Rect(
-            self.pos.x + mask_rect.x,
-            self.pos.y + mask_rect.y + mask_rect.height // 2,
+            self.rect.centerx - mask_rect.width / 2,
+            self.rect.centery - mask_rect.height / 4 + 3,
             mask_rect.width,
-            mask_rect.height // 2
+            mask_rect.height / 2
         )
 
-    def update(self, dt: float) -> None:
+
+    def update(self, dt: float, others) -> None:
         if self.vel.x:
             self.is_right = self.vel.x > 0
 
-        self.body.velocity = self.vel.x, self.vel.y
-        self.pos = pg.Vector2(self.body.position)
-
+        self.pos.x += self.vel.x * dt
+        self.rect.left = self.pos.x
         self.set_hitbox()
-        self.rect.topleft = self.pos
+        self.handle_collision(others, vertical=False)
+
+        self.pos.y += self.vel.y * dt
+        self.rect.top = self.pos.y
+        self.set_hitbox()
+        self.handle_collision(others, vertical=True)
+
         self.z_index = self.hitbox.bottom
 
         if self.animation.can_switch_state(self.state):
@@ -129,6 +132,37 @@ class Entity(pg.sprite.Sprite):
         result = image, rect, self.z_index
         return [result]
 
+    def handle_collision(self, others, vertical=True):
+        collides = pg.sprite.spritecollide(self, others, False)
+        if collides:
+            if vertical:
+                for collidable in collides:
+                    rect = collidable.hitbox if hasattr(collidable, "hitbox") else collidable.rect
+                    if self.hitbox.colliderect(rect):
+                        if self.vel.y > 0:
+                            self.hitbox.bottom = rect.top
+                            self.rect.bottom = self.hitbox.bottom + self.hitbox_bottom_offset
+                        elif self.vel.y < 0:
+                            self.hitbox.top = rect.bottom
+                            self.rect.top = self.hitbox.top + self.hitbox_top_offset
+                        self.pos.y = self.rect.top
+                        self.vel.y = 0
+
+            else:
+                for collidable in collides:
+                    rect = collidable.hitbox if hasattr(collidable, "hitbox") else collidable.rect
+                    if self.hitbox.colliderect(rect):
+                        if self.vel.x > 0:
+                            self.hitbox.right = rect.left
+                            self.rect.right = self.hitbox.right + self.hitbox_right_offset
+                        elif self.vel.x < 0:
+                            self.hitbox.left = rect.right
+                            self.rect.left = self.hitbox.left + self.hitbox_left_offset
+                        self.pos.x = self.rect.left
+                        self.vel.x = 0
+
+
+
 
 class Player(Entity):
     def __init__(self, pos: tuple, space=None):
@@ -146,7 +180,7 @@ class Player(Entity):
             return False
         return True
 
-    def update(self, dt: float) -> None:
+    def update(self, dt: float, others) -> None:
         """
         It's important to handle immutables before movement states
         """
@@ -183,7 +217,7 @@ class Player(Entity):
                 self.animation.switch_to(self.state, loop_duration=1.2)
             self.vel = pg.Vector2(0, 0)
 
-        super().update(dt)
+        super().update(dt, others)
 
     def debug_state(self):
         print(f"State: {self.state}, Velocity: {self.vel}, Animation Done: {self.animation.done}, Is roll: {self.keys["roll"]}", end="\r")

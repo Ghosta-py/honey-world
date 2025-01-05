@@ -1,83 +1,91 @@
-import pygame as pg
-import pymunk
-import pymunk.pygame_util
+# setup #
+import pygame, sys
+# setup pygame/window #
+mainClock = pygame.time.Clock()
+from pygame.locals import *
+pygame.init()
+pygame.display.set_caption('Physics Explanation')
+screen = pygame.display.set_mode((500,500),0,32)
 
-# Initialize Pygame
-pg.init()
+player = pygame.Rect(100,100,40,80)
 
-# Constants
-SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
-PLAYER_WIDTH, PLAYER_HEIGHT = 40, 40
+tiles = [pygame.Rect(200,350,50,50),pygame.Rect(260,320,50,50)]
 
-# Set up the game screen
-screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-clock = pg.time.Clock()
+def collision_test(rect,tiles):
+    collisions = []
+    for tile in tiles:
+        if rect.colliderect(tile):
+            collisions.append(tile)
+    return collisions
 
-# Pymunk space setup
-space = pymunk.Space()
-space.gravity = (0, 500)  # Set gravity to something realistic
+def move(rect, movement, tiles):
+    rect.x += movement[0]
+    collisions = collision_test(rect, tiles)
+    for tile in collisions:
+        if movement[0] > 0:
+            rect.right = tile.left
+        if movement[0] < 0:
+            rect.left = tile.right
+    rect.y += movement[1]
+    collisions = collision_test(rect,tiles)
+    for tile in collisions:
+        if movement[1] > 0:
+            rect.bottom = tile.top
+        if movement[1] < 0:
+            rect.top = tile.bottom
+    return rect
 
-def add_static_box(space, x, y, width, height):
-    body = pymunk.Body(body_type=pymunk.Body.STATIC)
-    body.position = x, y
-    shape = pymunk.Poly.create_box(body, (width, height))
-    space.add(body, shape)
-    return shape
+right = False
+left = False
+up = False
+down = False
 
-def add_kinematic_player(space, x, y, width, height):
-    body = pymunk.Body(body_type=pymunk.Body.KINEMATIC)
-    body.position = x, y
-    shape = pymunk.Poly.create_box(body, (width, height))
-    shape.elasticity = 0.9  # Bouncy collisions
-    shape.collision_type = 1
-    space.add(body, shape)
-    return body, shape
 
-# Collision handler for the player
-def on_collision_begin(arbiter, space, data):
-    print("Collision detected!")
-    return True  # Allow the collision to happen
+# loop #
+while True:
+    # clear display #
+    screen.fill((0,0,0))
 
-handler = space.add_collision_handler(1, 1)
-handler.begin = on_collision_begin
+    movement = [0,0]
+    if right == True:
+        movement[0] += 5
+    if left == True:
+        movement[0] -= 5
+    if up == True:
+        movement[1] -= 5
+    if down == True:
+        movement[1] += 5
 
-# Add static box and kinematic player
-static_box = add_static_box(space, 400, 500, 200, 20)
-player_body, player_shape = add_kinematic_player(space, 100, 100, PLAYER_WIDTH, PLAYER_HEIGHT)
+    player = move(player,movement,tiles)
 
-# Main game loop
-running = True
-while running:
-    dt = clock.tick(60) / 1000  # Time step in seconds
-    screen.fill((30, 30, 30))   # Clear the screen
+    pygame.draw.rect(screen,(255,255,255),player)
 
-    # Handle events
-    for event in pg.event.get():
-        if event.type == pg.QUIT:
-            running = False
-
-    # Handle player movement (manual for kinematic object)
-    keys = pg.key.get_pressed()
-    velocity = [0, 0]
-    if keys[pg.K_LEFT]:
-        velocity[0] = -200
-    if keys[pg.K_RIGHT]:
-        velocity[0] = 200
-    if keys[pg.K_UP]:
-        velocity[1] = -200
-    if keys[pg.K_DOWN]:
-        velocity[1] = 200
-
-    # Update player position manually
-    player_body.position += pymunk.Vec2d(*velocity) * dt
-
-    # Step the physics simulation
-    space.step(dt)
-
-    # Pymunk debugging
-    options = pymunk.pygame_util.DrawOptions(screen)
-    space.debug_draw(options)
-
-    pg.display.flip()
-
-pg.quit()
+    for tile in tiles:
+        pygame.draw.rect(screen,(255,0,0),tile)
+    # event handling #
+    for event in pygame.event.get():
+        if event.type == QUIT:
+            pygame.quit()
+            sys.exit()
+        if event.type == KEYDOWN:
+            if event.key == K_RIGHT:
+                right = True
+            if event.key == K_LEFT:
+                left = True
+            if event.key == K_DOWN:
+                down = True
+            if event.key == K_UP:
+                up = True
+        if event.type == KEYUP:
+            if event.key == K_RIGHT:
+                right = False
+            if event.key == K_LEFT:
+                left = False
+            if event.key == K_DOWN:
+                down = False
+            if event.key == K_UP:
+                up = False
+    
+    # update display #
+    pygame.display.update()
+    mainClock.tick(60)
