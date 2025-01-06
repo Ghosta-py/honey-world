@@ -34,8 +34,8 @@ class Game:
         return True
 
     def update(self, dt):
-        collides = self.map.objects
-        collides.add(self.test)
+        collides = self.map.collidables
+        collides.add(pg.sprite.GroupSingle(self.test))
         self.test.update(dt, collides)
         self.player.update(dt, collides)
         self.camera.follow(self.player)
@@ -51,8 +51,10 @@ class Game:
                 self.__init__()
             if keys[pg.K_UP]:
                 self.speed_modifier += 0.1
+                print("Speeding up! Speed: ", self.speed_modifier)
             if keys[pg.K_DOWN]:
                 self.speed_modifier -= 0.1
+                print("Slowing down! Speed: ", self.speed_modifier)
             self.player.handle_event(event)
 
     def add_drawable(self, drawable, target):
@@ -69,9 +71,13 @@ class Game:
         self.add_drawable(drawables, self.map.get_layer(self.screen, "Trees",self.camera.apply))
         drawables = sorted(drawables, key=lambda x: x[2])
 
-        for image, pos, _ in drawables:
-            pg.draw.rect(self.screen, (_ % 255, 0, 0), pos, 1)
-            self.screen.blit(image, pos)
+        if not DEBUG:
+            for image, pos, _ in drawables:
+                self.screen.blit(image, pos)
+        else:
+            for image, pos, _ in drawables:
+                pg.draw.rect(self.screen, (_ % 255, 0, 0), pos, 1)
+                self.screen.blit(image, pos)
 
         new_height = int(self.display.width / (self.aspect))
         scaled_screen = pg.transform.scale(self.screen, (self.display.width, new_height))
@@ -80,9 +86,10 @@ class Game:
 
     def run(self):
         while self.running:
-            dt = self.clock.tick(60) / 1000
+            dt = self.clock.tick() / 1000
             dt += dt * self.speed_modifier
             self.update(dt)
             self.handle_events()
+            pg.display.set_caption(f"FPS: {int(self.clock.get_fps())} Speed Modifier: {self.speed_modifier} DT: {dt}")
             self.draw()
         pg.quit()

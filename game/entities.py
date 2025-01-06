@@ -126,7 +126,8 @@ class Entity(pg.sprite.Sprite):
         rect = offset(self.rect)
         image = self.image
         self.hitbox = offset(self.hitbox)
-        pg.draw.rect(screen, (0, 255, 0), self.hitbox, 1)
+        if DEBUG:
+            pg.draw.rect(screen, (0, 255, 0), self.hitbox, 1)
         if not self.is_right:
             image = pg.transform.flip(image, True, False)
         result = image, rect, self.z_index

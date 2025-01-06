@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "",
+    "activeFile": "test.tmx",
     "expandedProjectPaths": [
         "."
     ],
@@ -13,14 +13,26 @@
             "scaleInDock": 3
         },
         "Forest Objects.tsx": {
-            "dynamicWrapping": false
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "Forest.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         },
         "Tileset.tsx": {
             "scaleInDock": 0.0625,
             "scaleInEditor": 3
         },
         "Trees.tsx": {
-            "dynamicWrapping": true
+            "dynamicWrapping": true,
+            "scaleInDock": 1,
+            "scaleInEditor": 0.33
+        },
+        "Village.tsx": {
+            "dynamicWrapping": false
         },
         "grass.tsx": {
             "scaleInDock": 1,
@@ -49,10 +61,30 @@
                 "x": 1024,
                 "y": 1024
             }
+        },
+        "test.tmx": {
+            "expandedObjectLayers": [
+                8,
+                9
+            ],
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 100,
+                "y": 166.5
+            }
+        },
+        "test2.tmx": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 213,
+                "y": 149.5
+            }
         }
     },
     "last.exportedFilePath": "/home/mostafa/Desktop/dev/honey_world/maps",
-    "last.imagePath": "/home/mostafa/Desktop/dev/honey_world/assets/Tileset/Pixel Lands Forest Demo/objects",
+    "last.imagePath": "/home/mostafa/Desktop/dev/honey_world/assets/Tileset/Pixel Lands Village Demo",
     "map.fixedSize": true,
     "map.height": 20,
     "map.lastUsedExportFilter": "Tiled map files (*.tmx *.xml)",
@@ -61,10 +93,18 @@
     "map.tileWidth": 16,
     "map.width": 30,
     "openFiles": [
+        "test.tmx",
+        "Forest.tsx",
+        "Forest Objects.tsx",
+        "Trees.tsx"
     ],
     "project": "proj.tiled-project",
-    "property.type": "bool",
+    "property.type": "object",
     "recentFiles": [
+        "Trees.tsx",
+        "Forest Objects.tsx",
+        "Forest.tsx",
+        "test.tmx",
         "Tileset.tsx",
         "map2.tmx",
         "map.tmx",
@@ -77,5 +117,5 @@
         "height": 16,
         "width": 16
     },
-    "tileset.type": 1
+    "tileset.type": 0
 }

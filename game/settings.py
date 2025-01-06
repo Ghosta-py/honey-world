@@ -7,6 +7,8 @@ BASE = os.path.abspath(".")
 ASSETS_DIR = os.path.join(BASE, "assets")
 ASSETS = dict()
 
+DEBUG = True
+
 SCALE = 2
 MIN_WIDTH = 160
 MIN_HEIGHT = 160
