@@ -39,19 +39,22 @@ class Map:
         self.collidables = pg.sprite.Group()
 
         for layer in self.map.visible_layers:
+            print(getattr(self.map.get_layer_by_name(layer.name), "class"))
             self._process_layer(layer)
 
         self.tiles = self._create_tiles()
         self.objects = self._create_objects()
 
     def _process_layer(self, layer):
+        class_ = getattr(layer, "class")
         """Process each layer and add it to the appropriate group."""
-        if hasattr(layer, "tiles"):
-            self.layers[layer.name] = self._create_layer_tiles(layer)
-        elif layer.name == "Trees":
-            self.layers[layer.name] = self._create_layer_decor(layer)
-        elif layer.name == "Collisions":
-            self.layers[layer.name] = self._create_layer_collisions(layer)
+        match class_:
+            case "static":
+                self.layers[layer.name] = self._create_layer_tiles(layer)
+            case "hitbox":
+                self.layers[layer.name] = self._create_layer_decor(layer)
+            case "colls":
+                self.layers[layer.name] = self._create_layer_collisions(layer)
 
     def _create_layer_tiles(self, layer):
         return pg.sprite.Group([
@@ -94,13 +97,6 @@ class Map:
         return self.tile_cache[surface]
 
     def get_layer(self, screen, layer_name, offset=lambda x: x):
-        """
-        Get a list of drawable objects from a specific layer for external z-axis rendering.
-
-        :param layer_name: Name of the layer to retrieve.
-        :param offset: Function to apply positional offsets (e.g., camera movement).
-        :return: List of tuples [(image, rect, z_index), ...].
-        """
         if layer_name not in self.layers:
             raise ValueError(f"Layer '{layer_name}' does not exist.")
         if DEBUG:

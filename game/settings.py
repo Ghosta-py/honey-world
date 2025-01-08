@@ -47,3 +47,4 @@ def get_map_size():
     return MAP_SIZE
 NAMEING_CONVENTION = "{NAME}_{ACTION}_{IMAGE_TYPE}{FRAME_COUNT}"
 
+LAYER_TYPES = {"static", "hitbox", "colls"}
